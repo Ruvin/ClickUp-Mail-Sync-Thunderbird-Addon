@@ -1653,7 +1653,7 @@ function showErrorMessage(message, link) {
     <div style="width: 400px;padding: 10px; background: #f8d7da; border: 1px solid #721c24; color: #721c24; border-radius: 5px;">
     <strong>Error:</strong> ${message} <br> <br>
     <p>Please go to the plugin settings and validate the credentials</p> <br>
-    <p>Tools > Add-ons and Themes > Extensions > Conscious ClickUp Save > Options</p><br>
+    <p>Tools > Add-ons and Themes > Extensions > ClickUp Mail Sync > Options</p><br>
     <a style="display: contents;" href="${link}" target="_blank" style="color: blue; text-decoration: underline;">Please click here to see more details</a>
     </div>
 <style>
