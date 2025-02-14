@@ -1,0 +1,341 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title></title>
+<link href="styles.css" type="text/css" rel="stylesheet" />
+<link href="styles-panel.css" type="text/css" rel="stylesheet" />
+<script src="browser_action.js" type="application/javascript" defer=""></script>
+<link href="assets/sweetalert2.min.css" rel="stylesheet">
+<script type="application/javascript" src="assets/sweetalert2.min.js" charset="UTF-8"></script>
+<style type="text/css">
+
+button {
+font: caption !important;
+height: auto;
+}
+
+
+/*
+below css code taken from
+https://github.com/davidwerbrouck/wizard/blob/master/index.html
+*/
+nav {
+display: grid;
+grid: 1fr / auto auto;
+/*  grid: 1fr / auto-flow auto;*/
+box-shadow: 0 2px 4px 0 #e9e9eb
+}
+
+a {
+-webkit-tap-highlight-color: transparent;
+display: grid;
+grid: 1fr / 34px auto 34px;
+align-items: center;
+border: 1px solid #b5b5b9;
+border-width: 1px 0;
+text-decoration: none;
+background: #f6f6f7
+}
+
+a:first-child {
+border-radius: 4px 0 0 4px;
+border-width: 1px 0 1px 1px;
+grid: 1fr/auto 34px
+}
+
+a:last-child {
+border-radius: 0 4px 4px 0;
+border-width: 1px 1px 1px 0;
+grid: 1fr / 34px auto
+}
+
+
+a:not(:first-child):before,
+a:not(:last-child):after {
+display: block;
+/*  border: 34px solid transparent;*/
+border-right-width: 0;
+content: ''
+}
+
+span {
+padding: 0 20px 0 30px;
+line-height: 1.2rem;
+color: #b5b5b9
+}
+
+span:first-line {
+color: #b5b5b9;
+font-weight: 700;
+font-size: .85rem
+}
+
+.current {
+background: #5b5b61
+}
+
+.current span {
+color: #b5b5b9
+}
+
+.current span:first-line {
+color: white
+}
+
+.current:not(:first-child):before {
+border-left-color: #5b5b61
+}
+
+.current:not(:last-child):after {
+border-left-color: #5b5b61
+}
+
+.current+a:not(:first-child):before {
+border-left-color: #5b5b61
+}
+
+a:not(.current):hover span,
+.done span {
+color: #5b5b61
+}
+
+a:not(.current):hover span:first-line,
+.done span:first-line {
+color: #1d1d1f
+}
+
+a:not(.current):hover {
+background: #e9e9eb
+}
+
+a:not(.current):hover:not(:last-child):after,
+a:not(.current):hover:not(:first-child):before {
+border-left-color: #e9e9eb
+}
+
+a:not(.current):hover+a:not(.current):not(:first-child):before {
+border-left-color: #e9e9eb
+}
+
+.current+a:not(.current):hover:not(:first-child):before {
+border-left-color: #5b5b61
+}current):hover+a:not(.current):not(:first-child):before{border-left-color:#e9e9eb}.current+a:not(.current):hover:not(:first-child):before{border-left-color:#5b5b61}
+
+
+.nav-a-tag-cls{
+padding: 10px 5px;
+border-left: 3px solid #b5b5ba;
+border-left-style: double;
+
+}
+
+#hnav-menu a:nth-child(2),  
+#hnav-menu a:last-child {
+border-left: 2px solid #e9e9eb; /* Change color and size as needed */
+}
+
+
+.text-section-user{
+font-size: 1.385em;
+font-weight: lighter;
+align-self: center;
+margin-left: auto;
+}
+
+#text-section-user-name{
+padding: 0;
+font-weight: lighter;
+color: #ed5520;
+}
+
+
+
+
+footer .footer-bottom a{
+	display: contents;
+	color: #ed5520;
+}
+footer .footer-bottom{
+text-align: center;
+  padding: 0px 0px 10px 0px;	
+}
+.text-section-header{
+	color: #ed5520;
+}
+.radio-btn-cls{
+	padding: 10px 0px 0px 101px;
+}
+</style>
+</head>
+
+
+<body>
+<div class="panel">
+<div class="panel-arrowUp"></div>
+<div class="panel-section panel-section-header">
+<div> <img src="images/conscious-32px.png"> &nbsp; </div>  
+<div class="text-section-header">ClickUp Mail Sync</div>
+<div class="text-section-user">Hi <span id="text-section-user-name">...</span></div>
+</div>
+
+<div class="wrapper-body-cls" id="wrapper-body" style="display:none;">
+<nav id="hnav-menu">
+<a class="nav-a-tag-cls cuSearchOption"  id="cuSearchOptionM1"  data-value='1' style="padding-left: 34px;">
+<span>
+Inside Folders<br>
+click here
+</span>
+</a>
+<a class="nav-a-tag-cls cuSearchOption"  id="cuSearchOptionM2" data-value='2'>
+<span>
+Outside Folders<br>
+click here
+</span>
+</a>
+<a class="nav-a-tag-cls cuSearchOption" id="cuSearchOptionM3" data-value='3'>
+<span>
+Search By<br>
+Task-ID / Custom-ID
+</span>
+</a>
+<a class="nav-a-tag-cls cuSearchOption" id="cuSearchOptionM4" data-value='4'>
+<span>
+Search By Tag<br>   
+</span>
+</a>
+</nav>
+
+<div class="panel-section-separator"></div>
+<div class="panel-section panel-section-formElements">
+<div class="panel-section panel-section-list">
+</div>
+
+<h4><u style="text-decoration: none;">Want some help? <a style="display:contents;color:#ed5520;" href="https://github.com/Ruvin/ClickUp-Mail-Sync-Thunderbird-Addon/wiki/User%E2%80%90guide" target="_blank"> click here</a></u></h4>
+
+ <br/>
+
+
+<div class="radio-btn-cls">
+	<input type="radio" id="save_as_text" name="cli_save_type" value="TEXT" checked class="chg-radio-cls">
+    <label for="save_as_text" title="Save as Plain Text">Plain Text</label>
+
+    <input type="radio" id="save_as_html" name="cli_save_type" value="HTML" class="chg-radio-cls">
+    <label for="save_as_html" title="Save as HTML">HTML</label>
+</div>
+
+
+<!-- List inside folders -->
+<div class="panel-section panel-section-formElements" id="listinsidefolders" style="display: none;"> 
+<div class="panel-formElements-item">
+<label for="picker01">Space:</label>
+<select class="form-control clisync-storeval" id="space_list" name="space_list">
+</select>    
+</div>
+
+<div class="panel-formElements-item">
+<label for="picker01">Folder:</label>
+<select class="form-control clisync-storeval" id="foder_list" name="foder_list">
+</select>    
+</div>
+
+<div class="panel-formElements-item">
+<label for="picker01">List:</label>
+<select class="form-control clisync-storeval" id="listOf_list" name="listOf_list">
+</select>  
+<button id="but_foder_list_createTask" name="but_foder_list_createTask" class="default">New Task</button>   
+</div>
+
+<div class="panel-formElements-item">
+<label for="picker01">Task:</label>
+<select class="form-control" id="listOf_task" name="listOf_task">
+</select>    
+</div>
+
+<div class="panel-section panel-section-footer"> <div class="panel-section-footer-button" id="but_close1">Cancel</div> <div class="panel-section-footer-separator"></div> <button id="but_insideList" class="panel-section-footer-button default">Save to ClickUp</button> </div>
+
+</div>
+<!-- END -->
+
+<!--  folderless list -->
+<div class="panel-section panel-section-formElements" id="listoutsidefolders" style="display: none;"> 
+<div class="panel-formElements-item">
+<label for="picker01">Space:</label>
+<select class="form-control clisync-storeval" id="folderless_space_list" name="folderless_space_list">
+</select>    
+</div>
+<div class="panel-formElements-item">
+<label for="picker01">List:</label>
+<select class="form-control clisync-storeval" id="folderless_listOf_list" name="folderless_listOf_list">
+</select>    
+<button id="but_foderless_list_createTask" name="but_foderless_list_createTask" class="default">New Task</button>   
+</div>
+<div class="panel-formElements-item">
+<label for="picker01">Task:</label>
+<select class="form-control" id="folderless_listOf_task" name="folderless_listOf_task">  </select> 
+</div>
+<div class="panel-section panel-section-footer"> <div class="panel-section-footer-button" id="but_close2">Cancel</div> <div class="panel-section-footer-separator"></div> <button id="but_outsideList" class="panel-section-footer-button default">Save to ClickUp</button> </div>
+</div>
+<!-- END -->
+
+<!--  Search by Task Name -->
+<div class="panel-section panel-section-formElements" id="listsearchbyTask" style="display: none;"> 
+<div class="panel-section"> <input type="text" id="search_task_name" name="search_task_name" maxlength="20" placeholder="Enter Task-ID or Custom-ID" />
+<div class="panel-section-footer-separator"></div><div> <button id="but_searchByTskName" name="but_searchByTskName" class="default">Search</button> 
+</div>
+</div>
+<br/>  
+<div class="panel-formElements-item">
+<div class="row">
+<div id="customIdTaskList_results">
+</div>
+</div>  
+</div> 
+<div class="panel-section panel-section-footer" id="searchedResultsubmit" style="display: none;"> <div class="panel-section-footer-button" id="but_close3">Cancel</div> <div class="panel-section-footer-separator"></div> <button id="but_seachTaskSubmit" name="but_seachTaskSubmit" class="panel-section-footer-button default">Save to ClickUp</button> </div>
+</div>
+<!-- END -->
+
+<!--  Search by TAG-->
+<div class="panel-section panel-section-formElements" id="listoutsideTagSearch" style="display: none;"> 
+<div class="panel-formElements-item">
+<label for="picker01">Space:</label>
+<select class="form-control clisync-storeval" id="searchbytag_space_list" name="searchbytag_space_list">
+</select>    
+</div>
+
+<div class="panel-formElements-item">
+<label for="picker01">Tag:</label>
+<select class="form-control clisync-storeval" id="searchbytag_gettag_list" name="searchbytag_gettag_list">
+</select>    
+<button id="but_searchByTagName" name="but_searchByTagName" class="default">Search</button> 
+</div>
+
+<br/>  
+<div class="panel-formElements-item">
+<div class="row">
+<div id="customIdTagList_results"></div>
+</div>  
+</div> 
+<div class="panel-section panel-section-footer" id="searchedResultsubmit" style=""> 
+	<div class="panel-section-footer-button" id="but_close3">Cancel</div> <div class="panel-section-footer-separator"></div> 
+	<button id="but_seachTagSubmit" name="but_seachTagSubmit" class="panel-section-footer-button default">Save to ClickUp</button> 
+</div>
+</div>
+<!-- TAG END -->
+
+<div class="panel-section panel-section-list" id="loader" style="display: none;color: crimson;">
+<div class="panel-list-item">
+<div class="icon"></div>
+<div  class="text">Loading...Please wait...!</div>
+<div class="text-shortcut"><img width="16px" src="images/loading2.gif" /></div>
+</div>
+</div>
+<div class="panel-section-separator"></div>
+</div>
+
+</div>
+</body>
+<footer><div class="footer-bottom"><a href="https://www.conscious.co.uk" target="_blank">- Conscious Solutions Ltd -</a></div></footer>
+</html>

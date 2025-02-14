@@ -1,0 +1,12 @@
+{
+  "extensionDescription": {
+    "message": "A plugin that allows you to store Thunderbird emails in ClickUp"
+  },
+  "extensionName": {
+    "message": "ClickUp Mail Sync"
+  },
+  "clickupBrowserAction": {
+    "message": "ClickUp Mail Sync"
+  }
+
+}

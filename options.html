@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<title></title>
+<link rel="stylesheet" href="options.css" crossorigin="anonymous" />
+<script src="options.js" defer></script>
+<link href="assets/sweetalert2.min.css" rel="stylesheet">
+<script type="application/javascript" src="assets/sweetalert2.min.js" charset="UTF-8"></script>
+</head>
+<body>
+<div class="before-wrapper">
+<h4>Please Enter the following details and first click the save button. then Authenticate with ClickUp</h4>
+<p><span style="color:brown;">[?]</span> Want some help! - <a href="https://github.com/Ruvin/ClickUp-Mail-Sync-Thunderbird-Addon/wiki" target="_blank"> Please read this</a></p>
+</div>
+<div class="wrapper container">
+<form>
+<div class="form-group row">
+<label for="clientId" class="col-sm-2 col-form-label"><span class="requi">*</span> Client ID:</label>
+<div class="col-sm-10">
+<input type="text" class="form-control" id="clientId" name="clientId" placeholder="Client ID" maxlength="500">
+</div>
+</div>
+<div class="form-group row">
+<label for="clientSecret" class="col-sm-2 col-form-label"><span class="requi">*</span> Client Secret:</label>
+<div class="col-sm-10">
+<input type="password" class="form-control" id="clientSecret" name="clientSecret" placeholder="Client Secret" maxlength="500">
+</div>
+</div>
+<div class="form-group row">
+<label for="redirect_url" class="col-sm-2 col-form-label"><span class="requi">*</span> Redirect URI:</label>
+<div class="col-sm-10">
+<input type="text" class="form-control" id="redirect_url" name="redirect_url" placeholder="https://your-redirect-url.com" maxlength="500">
+</div>
+</div>
+<div class="form-group row">
+<label for="redirect_url" class="col-sm-2 col-form-label">Your Team name and ID:</label>
+<div class="col-sm-10">
+<span  id="team-name"></span>  -  <span id="team-id"></span>
+</div>
+</div>
+<div class="form-group row">
+<div class="col-sm-10 option-btn">
+<button type="button" class="btn btn-secondary" id="saveButton" style="background-color: #E64F10; color: white;">1. Save</button>
+<button type="button" id="clk_auth_clickup" class="btn btn-secondary" style="background-color: #FF9044;color: white;">2. Authenticate ClickUp</button>    
+</div>      
+</div>
+<div class="form-group row">
+<div class="col-sm-10 option-btn">
+<button type="button" class="btn btn-secondary" id="deleteUserdata" style="margin-left:auto;background-color: red; color: white;">Delete all stored data</button>
+</div>      
+</div>
+<div class="panel-section panel-section-list" id="loader" style="display: none;color: crimson;">
+<div class="panel-list-item">
+<div class="icon"></div>
+<div  class="text">Loading...Please wait...!</div>
+<div class="text-shortcut"><img width="16px" src="images/loading2.gif" /></div>
+</div>
+</div>
+</form>
+</div>
+</body>
+</html>
