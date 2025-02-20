@@ -34,7 +34,7 @@ const URL_SET = "https://api.clickup.com/api/v2/";
 const USER_GUIDE_URL = "https://github.com/Ruvin/ClickUp-Mail-Sync-Thunderbird-Addon/wiki";
 let TEAM_ID = "";
 let SAVE_TYPE = ""; // HTML or Plain TEXT
-//const requests = {  accountCheckboxId : 'cliksyancaheckboranid' };
+
 
 /*
 * WINDOW INIT
@@ -102,9 +102,6 @@ return true;
 }
 
 
-
-
-
 saveWhenUserChangeRadioButtons(); // load the function Radio buttons
 async function saveWhenUserChangeRadioButtons() {
     var radioButtons = document.querySelectorAll(".chg-radio-cls");
@@ -119,9 +116,6 @@ async function saveWhenUserChangeRadioButtons() {
         });
     });
 }
-
-
-
 
 
 async function RadioBut_DefaultSet() {
@@ -176,13 +170,6 @@ await selectValueAfterLoad(selectBox,selectBoxVal);
 }
 
 
-
-
-
-
-
-
-
 async function selectValueAfterLoad(selectBox, selectBoxVal) {
     let spaceList = document.getElementById(selectBox.id);
 
@@ -201,8 +188,6 @@ async function selectValueAfterLoad(selectBox, selectBoxVal) {
 
     observer.observe(spaceList, { childList: true });
 }
-
-
 
 
 
@@ -234,7 +219,6 @@ let url = 'task/'+selectedVal+'/comment';
     }
     if (selectedVal === '') {
         swal('Error!', 'Please select a Task!', 'warning');
-       // alert('Please select a task from the drop-down');
         return;
     }
 
@@ -259,21 +243,13 @@ let url = 'task/'+selectedVal+'/comment';
             }
 
         
-
  let cleanedEmailBody = removeQuotedText(emailBodyText);
-
-
 if(SAVE_TYPE === "TEXT"){
             // Ensure the text is clean (remove HTML tags + extra whitespace)
             cleanedEmailBody = stripHtml(cleanedEmailBody);    
 }
 
   
-     
-
-
-
-
             let sendData = {
                 "comment_text": cleanedEmailBody,
                 "notify_all": false
@@ -297,14 +273,7 @@ swal('Success!', 'Mail List Successfully Saved!', 'success')
     }
 
 
-
-
-
-
 };
-
-
-
 
 
 
@@ -319,11 +288,6 @@ swal('Success!', 'Mail List Successfully Saved!', 'success')
 };
 
 
-
-
-
-
-
 /*
 * Search Button Tag submit
 */
@@ -336,9 +300,6 @@ if(document.querySelector('input[name="searchTagName"]:checked')){
 }
  
 let url = 'task/'+selectedVal+'/comment';
-
-
-
 
     let messageList = await browser.mailTabs.getSelectedMessages();
     if (messageList.messages.length === 0) {
@@ -381,12 +342,6 @@ if(SAVE_TYPE === "TEXT"){
             cleanedEmailBody = stripHtml(cleanedEmailBody);    
 }
 
-  
-     
-
-
-
-
             let sendData = {
                 "comment_text": cleanedEmailBody,
                 "notify_all": false
@@ -410,61 +365,13 @@ swal('Success!', 'Mail List Successfully Saved!', 'success')
     }
 
 
-
-/*
-let messageList = await browser.mailTabs.getSelectedMessages();
-if (messageList.messages.length == 0) {
-  //alert('Please Select least one email!');
-   swal(
-      'Error..!',
-      'Please Select least one email!',
-      'error'
-    );
-    return;
-}
-if (selectedVal == '') {
-  alert('Please Select a Task!');
-    return;
-}
-
-await messageList.messages.forEach(function(item, index) {
- getMsgFull(item.id).then(data => {
- let emailBodyText = data.parts[0].parts[0].body;
-
-
-sendData = {
-  "comment_text":emailBodyText, 
-  "notify_all": false
 };
-
-
- postData(url, sendData)
-  .then(data => {
-if(data == undefined){
-  this.window.close();
-}else{
-alert('Mail List Successfully Saved!');
-}
- });
-});
- });
-*/
-
-
-
-
-
-
-
-
-};
-
 
 
 
 
 /**
- * 🛠 Function to Convert HTML to Markdown (if needed)
+ * Function to Convert HTML to Markdown (if needed)
  */
 function htmlToMarkdown(html) {
     let turndownService = new TurndownService();
@@ -499,21 +406,6 @@ function removeQuotedText(body) {
     // If the cleaned body is shorter than the original, it means quotes were removed
     return cleanedBody.length < originalBody.length ? cleanedBody + "\n\n..." : cleanedBody;
 }
-
-
-/*
-// Function to clean the reply/quoted text
-function removeQuotedText(body) {
-return body
-.split(/(?:On\s.*?wrote:|From:|To:|Subject:)/i)[0] // Removes quoted sections
-.split(/\n>/)[0]  // Removes any email client "quoted" text
-.trim();  // Clean up extra spaces
-}
-
-*/
-
-
-
 
 
 
@@ -721,24 +613,12 @@ option.setAttribute("class", "radioItem");
 
       });
       
-
-
-
-
-
-
-
-
-
 };
 
 
 
 
 /*TAG SEARCH SECTION*/
-
-
-
 /*
 * Dependant drop-down: Generation Spaces when page load : Search by Tag
 */
@@ -966,12 +846,6 @@ let selectedText = selectElement.options[selectElement.selectedIndex].text;
     }
 
 
-
-
-
-
-
-
 swal({
   title: "Are you sure?",
   text: `Please Note: this will create a new task(s) inside \nList name: ${selectedText}\n\nTask name will be => mail subject\nTask description will be => mail body text\n\n*You can select maximum 5 emails at a time\n*Mail subject and body text will be saved as plain TEXT format`,
@@ -1041,9 +915,6 @@ sendData = {
 
 
 
-
-
-
             let response = await postData(url, sendData);
 
             if (!response) {
@@ -1063,9 +934,6 @@ swal('Success!', 'New Task Successfully Created!', 'success')
 
 
 }
-
-
-
 
 
 
@@ -1139,12 +1007,6 @@ option.setAttribute("class", "radioItem");
 }
 
 /* TAG - END*/
-
-
-
-
-
-
 /*
 * Dependant drop-down: Generation Spaces when page load : folderless
 */
@@ -1292,10 +1154,6 @@ Array.prototype.forEach.call(radios, function(radio) {
 
 
 
-
-
-
-
 function radioChangeHandler(event) {
    if ( this.value === '1' ) {
  listinsidefolders.style.display = 'block';
@@ -1307,14 +1165,9 @@ but_seachTaskSubmit.classList.add('disabled');
 but_insideList.disabled = true;
 but_outsideList.disabled = true;
 but_seachTaskSubmit.disabled = true;
-
 listoutsideTagSearch.style.display = 'none';
-
-
-
 document.querySelector("#listOf_task").selectedIndex = 0;
 document.querySelector("#folderless_listOf_task").selectedIndex = 0;
-
    } else if ( this.value === '2' ) {
  listoutsidefolders.style.display = 'block';
  listinsidefolders.style.display = 'none';
@@ -1328,7 +1181,6 @@ but_insideList.disabled = true;
 but_outsideList.disabled = true;
 but_seachTaskSubmit.disabled = true;
 listoutsideTagSearch.style.display = 'none';
-   
    }  else if( this.value === '3' ) {
   listsearchbyTask.style.display = 'block';
   listinsidefolders.style.display = 'none';
@@ -1342,9 +1194,6 @@ but_insideList.disabled = true;
 but_outsideList.disabled = true;
 but_seachTaskSubmit.disabled = false;
 listoutsideTagSearch.style.display = 'none';  
-
-
-
    }  else if( this.value === '4' ) {
     listoutsideTagSearch.style.display = 'block';
   listsearchbyTask.style.display = 'none';
@@ -1358,13 +1207,6 @@ document.querySelector("#folderless_listOf_task").selectedIndex = 0;
 but_insideList.disabled = true;
 but_outsideList.disabled = true;
 but_seachTaskSubmit.disabled = false;
-
-
-
-
-
-
-
    }else{
     //default
      listinsidefolders.style.display = 'block';

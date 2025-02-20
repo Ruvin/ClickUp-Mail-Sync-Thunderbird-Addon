@@ -47,11 +47,6 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return true; // Required for async sendResponse
     }
 
-    //   if (request.action === "loginClickup") {
-    //     loginClickup().then(sendResponse).catch(error => sendResponse({ error: error.message }));
-    //     return true; // Required for async sendResponse
-    // }
-
 });
 
 // Generate a random state value for security
@@ -60,9 +55,6 @@ function generateRandomState() {
            Math.random().toString(36).substring(2, 15);
 }
 
-// Function to handle authentication
-// async function loginClickup() {   
-// }
 
 // Function to handle authentication
 async function authClickup() {   

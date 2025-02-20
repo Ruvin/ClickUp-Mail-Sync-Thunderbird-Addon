@@ -118,7 +118,7 @@ return data;
 
 document.getElementById("deleteUserdata").addEventListener("click", async () => {
 // Show confirmation dialog
-let confirmDelete = confirm("Are you sure you want to clear all stored data for the plugin? \nEg: Cliend ID, Cliend Secret, Redirect URI");
+let confirmDelete = confirm("Are you sure you want to clear all the stored data of the plugin? \nEg: Cliend ID, Cliend Secret, Redirect URI etc.");
 
 if (confirmDelete) {
 try {
