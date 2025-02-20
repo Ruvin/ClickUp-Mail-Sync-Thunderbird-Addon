@@ -202,4 +202,27 @@ async function getData(url_endpoint = '') {
     }
 }
 
+/*
+To set Thunderbird plugin options only when the plugin is first installed
+@param:
+The extension is installed (reason === "install")
+The extension is updated (reason === "update")
+The browser is updated (reason === "browser_update")
+*/
+browser.runtime.onInstalled.addListener((details) => {
+    if (details.reason === "install") {
+       // console.log("Thunderbird extension installed. Setting default options");
+
+        // Set default options in storage
+        browser.storage.local.set({
+            outsideFolders: false,
+            searchByTaskID: true,
+            searchByTag: false
+        }).then(() => {
+            console.log("Default settings have been saved.");
+        }).catch((error) => {
+            console.error("Error setting default options:", error);
+        });
+    }
+});
 

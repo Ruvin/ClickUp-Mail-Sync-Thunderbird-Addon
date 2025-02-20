@@ -76,3 +76,8 @@ color: red;
 #team-name, #team-id{
 color: blue;
 }
+
+
+.default-items input {
+width: auto;
+}

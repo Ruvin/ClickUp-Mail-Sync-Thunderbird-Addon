@@ -168,6 +168,13 @@ text-align: center;
 .radio-btn-cls{
 	padding: 10px 0px 0px 101px;
 }
+
+
+.menu-panel-hide{
+	display: none !important;
+}
+
+
 </style>
 </head>
 
@@ -183,29 +190,34 @@ text-align: center;
 
 <div class="wrapper-body-cls" id="wrapper-body" style="display:none;">
 <nav id="hnav-menu">
+
 <a class="nav-a-tag-cls cuSearchOption"  id="cuSearchOptionM1"  data-value='1' style="padding-left: 34px;">
 <span>
-Inside Folders<br>
+List Inside Folders<br>
 click here
 </span>
 </a>
-<a class="nav-a-tag-cls cuSearchOption"  id="cuSearchOptionM2" data-value='2'>
+
+<a class="nav-a-tag-cls cuSearchOption menu-panel-hide"  id="cuSearchOptionM2" data-value='2'>
 <span>
-Outside Folders<br>
+List Outside Folders<br>
 click here
 </span>
 </a>
-<a class="nav-a-tag-cls cuSearchOption" id="cuSearchOptionM3" data-value='3'>
+
+<a class="nav-a-tag-cls cuSearchOption menu-panel-hide" id="cuSearchOptionM3" data-value='3'>
 <span>
 Search By<br>
 Task-ID / Custom-ID
 </span>
 </a>
-<a class="nav-a-tag-cls cuSearchOption" id="cuSearchOptionM4" data-value='4'>
+
+<a class="nav-a-tag-cls cuSearchOption menu-panel-hide" id="cuSearchOptionM4" data-value='4'>
 <span>
 Search By Tag<br>   
 </span>
 </a>
+
 </nav>
 
 <div class="panel-section-separator"></div>

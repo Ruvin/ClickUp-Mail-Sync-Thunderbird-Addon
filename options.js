@@ -28,6 +28,13 @@ document.getElementById("redirect_url").value = getdata.redirectUrl || "";
 
 document.querySelector("#team-name").innerHTML = getdata.teamName || "";
 document.querySelector("#team-id").innerHTML = getdata.teamId || "";
+
+//default menu items
+document.getElementById("outsideFolders").checked = getdata.outsideFolders;
+document.getElementById("searchByTaskID").checked = getdata.searchByTaskID;
+document.getElementById("searchByTag").checked = getdata.searchByTag;
+
+
 });
 
 document.getElementById("saveButton").addEventListener("click", async () => {
@@ -35,12 +42,16 @@ let clientId = document.getElementById("clientId").value;
 let clientSecret = document.getElementById("clientSecret").value;
 let redirectUrl = document.getElementById("redirect_url").value;
 
+let searchByTaskID = document.getElementById("searchByTaskID").checked;
+let outsideFolders = document.getElementById("outsideFolders").checked;
+let searchByTag = document.getElementById("searchByTag").checked;
+
 // await browser.runtime.sendMessage({ action: "saveCredentials", clientId, clientSecret });
 if(clientId == "" || clientSecret == "" || redirectUrl == ""){
 alert("Please enter the required fields!");
 return;  
 }
-saveCredentials(clientId, clientSecret,redirectUrl)
+saveCredentials(clientId, clientSecret,redirectUrl,searchByTaskID,outsideFolders,searchByTag)
 .then(data => {  
 if(data){
   swal('Success!', 'Credentials saved successfully! \n\nPlease click - `Authenticate Clickup` after close this window', 'success')
@@ -49,9 +60,6 @@ if(data){
 });
 
 
-// .then(() => {
-// // saveAndLogin_to_Clickup(); // Login to Clickup app 
-// });
 
 }   
 });
@@ -59,14 +67,7 @@ if(data){
 
 
 
-// async function saveAndLogin_to_Clickup() {
-//     try {
-//         let data = await browser.runtime.sendMessage({ action: "loginClickup" });
-//         console.log('Access Token:', data);
-//      } catch (error) {
-//         console.error("Error during authentication:", error);
-//   }
-// }
+
 
 
 
@@ -103,15 +104,15 @@ browser.runtime.reload();
 
 
 
-async function saveCredentials(clientId, clientSecret,redirectUrl) {
+async function saveCredentials(clientId, clientSecret,redirectUrl,searchByTaskID,outsideFolders,searchByTag) {
 let status = false;
-await browser.storage.local.set({ clientId, clientSecret, redirectUrl });
+await browser.storage.local.set({ clientId, clientSecret, redirectUrl, searchByTaskID:searchByTaskID, outsideFolders:outsideFolders, searchByTag:searchByTag });
 status = true;
 return status;
 }
 
 async function getCredentials() {
-let data = await browser.storage.local.get(["clientId", "clientSecret", "redirectUrl","teamName", "teamId"]);
+let data = await browser.storage.local.get(["clientId", "clientSecret", "redirectUrl","teamName", "teamId", "searchByTaskID", "outsideFolders", "searchByTag"]);
 return data;
 }
 
@@ -122,7 +123,6 @@ let confirmDelete = confirm("Are you sure you want to clear all stored data for 
 if (confirmDelete) {
 try {
 await browser.storage.local.clear();
-// console.log("All local storage data cleared!");
 alert("Storage cleared successfully!");
 } catch (error) {
 console.error("Error clearing storage:", error);

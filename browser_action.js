@@ -60,8 +60,6 @@ but_seachTaskSubmit.disabled = true;
 //document.getElementById("cuSearchOption1").checked= true;
 
 
-
-
 let targetLink = document.getElementById("cuSearchOptionM1");
 if (targetLink) {
     targetLink.click(); // Trigger the click event
@@ -79,10 +77,30 @@ folderless_onLoadSpaces();
 searchByTag_onLoadSpaces(); 
 setSelboxVals(); 
 RadioBut_DefaultSet();
+menuItems_DefaultSet();
 
 }
 }
 }
+
+
+
+async function menuItems_DefaultSet() {
+let data = await browser.storage.local.get(["searchByTaskID", "outsideFolders", "searchByTag"]);
+
+if(data.searchByTaskID == true){
+    document.getElementById("cuSearchOptionM3").classList.remove("menu-panel-hide");
+}
+if(data.outsideFolders == true){
+    document.getElementById("cuSearchOptionM2").classList.remove("menu-panel-hide");
+}
+if(data.searchByTag == true){
+    document.getElementById("cuSearchOptionM4").classList.remove("menu-panel-hide");
+}
+
+return true;
+}
+
 
 
 
@@ -469,6 +487,21 @@ text = text.replace(/\n\s*\n+/g, '\n');
 return text.trim();
 }
 
+
+// Function to clean the reply/quoted text
+function removeQuotedText(body) {
+    const originalBody = body.trim();
+    const cleanedBody = body
+        .split(/(?:On\s.*?wrote:|From:|To:|Subject:)/i)[0] // Removes quoted sections
+        .split(/\n>/)[0]  // Removes any email client "quoted" text
+        .trim();  // Clean up extra spaces
+
+    // If the cleaned body is shorter than the original, it means quotes were removed
+    return cleanedBody.length < originalBody.length ? cleanedBody + "\n\n..." : cleanedBody;
+}
+
+
+/*
 // Function to clean the reply/quoted text
 function removeQuotedText(body) {
 return body
@@ -476,6 +509,11 @@ return body
 .split(/\n>/)[0]  // Removes any email client "quoted" text
 .trim();  // Clean up extra spaces
 }
+
+*/
+
+
+
 
 
 
@@ -637,21 +675,6 @@ this.window.close();
 * Search button by Custom Task ID
 */
 document.getElementById("but_searchByTskName").onclick = async () => {
-
-/*getClickUpTasks().then(tasks => {
-
-    if (tasks) {
-        console.log("ClickUp Tasks:", tasks);
-    } else {
-        console.log(" Could not fetch tasks.");
-    }
-})*/
-
-
-
-
-
-
 
 
  let custom_id = document.querySelector('#search_task_name').value;
@@ -888,7 +911,7 @@ sendData = {
   "name":emailSubject,
   "content":emailBodyText
 };
-//console.log(sendData);
+
 
             let response = await postData(url, sendData);
 
@@ -1019,7 +1042,7 @@ sendData = {
 
 
 
-//console.log(sendData);
+
 
             let response = await postData(url, sendData);
 
@@ -1037,64 +1060,6 @@ swal('Success!', 'New Task Successfully Created!', 'success')
         console.error("Error processing email:", error);
         swal('Error..!', 'An error occurred while saving emails.', 'error');
     }
-
-
-
-
-
-
-    // let messageList = await browser.mailTabs.getSelectedMessages();
-    // if (messageList.messages.length === 0) {
-    //     swal('Error..!', 'Please select at least one email!', 'error');
-    //     return;
-    // }
-    // if (list_id === '') {
-    //     swal('Error..!', 'Please select a list from the drop-down!', 'error');
-    //     return;
-    // }
-
-    // try {
-    //     for (const item of messageList.messages) {
-    //         let data = await getMsgFull(item.id);
-
-    //         // 🛠 Handle Different Email Structures
-    //         let emailBodyText = "";
-    //         if (data.parts && data.parts.length > 0) {
-    //             if (data.parts[0].parts && Array.isArray(data.parts[0].parts) && data.parts[0].parts.length > 0) {
-    //                 // Multi-part email: Extract body from first inner part
-    //                 emailBodyText = data.parts[0].parts[0].body || "";
-    //             } else {
-    //                 // Single-part email: Use the direct body
-    //                 emailBodyText = data.parts[0].body || "";
-    //             }
-    //         } else {
-    //             // Plain text fallback
-    //             emailBodyText = data.body || "";
-    //         }
-
-    //         let subjectTxt = data.headers.subject ? data.headers.subject[0] : "No Subject";
-
-    //         let sendData = {
-    //             "name": subjectTxt,
-    //             "content": stripHtml(emailBodyText) // Clean the text before sending
-    //         };
-
-    //         console.log("Creating Task with Data:", sendData);
-
-    //         let response = await postData(create_task, sendData);
-
-    //         if (!response) {
-    //             window.close();
-    //         } else {
-    //             alert('New task successfully created!');
-    //         }
-    //     }
-    // } catch (error) {
-    //     console.error("Error processing email:", error);
-    //     swal('Error..!', 'An error occurred while creating tasks.', 'error');
-    // }
-
-
 
 
 }
@@ -1286,7 +1251,6 @@ if (data.tasks !== undefined) {
 * Radio buttons options
 */
 
-//RR
 var hnav_as = document.querySelectorAll('#hnav-menu .cuSearchOption');
 
     
@@ -1305,14 +1269,13 @@ hnav_as.forEach(function(hnav_a) {
 });
 
 function spanClickHandler(value) {
-    //console.log("Selected data-value:", value);
 
 this.value = value;
 radioChangeHandler(this);
 
     // You can use the value here as needed
 }
-// RR end
+
 
 
 
