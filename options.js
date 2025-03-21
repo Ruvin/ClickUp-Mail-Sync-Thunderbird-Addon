@@ -34,6 +34,7 @@ document.getElementById("outsideFolders").checked = getdata.outsideFolders;
 document.getElementById("searchByTaskID").checked = getdata.searchByTaskID;
 document.getElementById("searchByTag").checked = getdata.searchByTag;
 
+document.getElementById("saveMailAttachment").checked = getdata.saveMailAttachment;
 
 });
 
@@ -45,13 +46,14 @@ let redirectUrl = document.getElementById("redirect_url").value;
 let searchByTaskID = document.getElementById("searchByTaskID").checked;
 let outsideFolders = document.getElementById("outsideFolders").checked;
 let searchByTag = document.getElementById("searchByTag").checked;
+let saveMailAttachment = document.getElementById("saveMailAttachment").checked;
 
 // await browser.runtime.sendMessage({ action: "saveCredentials", clientId, clientSecret });
 if(clientId == "" || clientSecret == "" || redirectUrl == ""){
 alert("Please enter the required fields!");
 return;  
 }
-saveCredentials(clientId, clientSecret,redirectUrl,searchByTaskID,outsideFolders,searchByTag)
+saveCredentials(clientId, clientSecret,redirectUrl,searchByTaskID,outsideFolders,searchByTag,saveMailAttachment)
 .then(data => {  
 if(data){
   swal('Success!', 'Credentials saved successfully! \n\nPlease click - `Authenticate Clickup` after close this window', 'success')
@@ -104,15 +106,15 @@ browser.runtime.reload();
 
 
 
-async function saveCredentials(clientId, clientSecret,redirectUrl,searchByTaskID,outsideFolders,searchByTag) {
+async function saveCredentials(clientId, clientSecret,redirectUrl,searchByTaskID,outsideFolders,searchByTag,saveMailAttachment) {
 let status = false;
-await browser.storage.local.set({ clientId, clientSecret, redirectUrl, searchByTaskID:searchByTaskID, outsideFolders:outsideFolders, searchByTag:searchByTag });
+await browser.storage.local.set({ clientId, clientSecret, redirectUrl, searchByTaskID:searchByTaskID, outsideFolders:outsideFolders, searchByTag:searchByTag,saveMailAttachment:saveMailAttachment });
 status = true;
 return status;
 }
 
 async function getCredentials() {
-let data = await browser.storage.local.get(["clientId", "clientSecret", "redirectUrl","teamName", "teamId", "searchByTaskID", "outsideFolders", "searchByTag"]);
+let data = await browser.storage.local.get(["clientId", "clientSecret", "redirectUrl","teamName", "teamId", "searchByTaskID", "outsideFolders", "searchByTag","saveMailAttachment"]);
 return data;
 }
 
