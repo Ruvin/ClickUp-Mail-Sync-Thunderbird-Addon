@@ -209,7 +209,8 @@ browser.runtime.onInstalled.addListener((details) => {
         browser.storage.local.set({
             outsideFolders: false,
             searchByTaskID: true,
-            searchByTag: false
+            searchByTag: false,
+            saveMailAttachment: false
         }).then(() => {
             console.log("Default settings have been saved.");
         }).catch((error) => {

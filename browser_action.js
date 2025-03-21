@@ -34,7 +34,7 @@ const URL_SET = "https://api.clickup.com/api/v2/";
 const USER_GUIDE_URL = "https://github.com/Ruvin/ClickUp-Mail-Sync-Thunderbird-Addon/wiki";
 let TEAM_ID = "";
 let SAVE_TYPE = ""; // HTML or Plain TEXT
-
+let SAVE_ATTACHMENT = false;
 
 /*
 * WINDOW INIT
@@ -77,8 +77,8 @@ folderless_onLoadSpaces();
 searchByTag_onLoadSpaces(); 
 setSelboxVals(); 
 RadioBut_DefaultSet();
+getSaveAttachement_checkVal();
 menuItems_DefaultSet();
-
 }
 }
 }
@@ -116,6 +116,17 @@ async function saveWhenUserChangeRadioButtons() {
         });
     });
 }
+
+
+getSaveAttachement_checkVal();
+async function getSaveAttachement_checkVal() {
+let radiobut =  await browser.storage.local.get("saveMailAttachment");
+if(radiobut.saveMailAttachment){
+SAVE_ATTACHMENT = true; // set options page save attachment checkbox value if it's true
+}
+return true;
+}
+
 
 
 async function RadioBut_DefaultSet() {
@@ -198,6 +209,103 @@ async function getMsgFull(itemId) {
 
 
 
+
+
+// Function to extract attachments from message parts
+function extractAttachments(message) {
+
+    let attachments = [];
+    // Iterate over the parts array of the message
+    if (message.parts && Array.isArray(message.parts)) {
+        for (let part of message.parts) {
+
+            // Check if the part is an attachment (e.g., contentType of application/pdf)
+            if (part.contentType && part.contentType.startsWith('application/') && part.headers) {
+                   attachments.push({
+                    contentType: part.contentType,
+                    headers: part.headers,  // e.g., application/pdf
+                    name: part.name,
+                    partName: part.partName,
+                    size: part.size 
+                });
+            }
+
+
+    if (part.parts && Array.isArray(part.parts)) {
+        for (let part1 of part.parts) {
+      // Check second part has an attachment (e.g., contentType of application/pdf)
+            if (part1.contentType && part1.contentType.startsWith('application/') && part1.headers) {
+                attachments.push({
+                    contentType: part1.contentType,
+                    headers: part1.headers,  // e.g., application/pdf
+                    name: part1.name,
+                    partName: part1.partName,
+                    size: part1.size 
+                });
+            }
+}
+}
+}
+}
+
+    return attachments;
+}
+
+
+
+
+
+
+async function getMailAttachmentsWithEmailBody(item,data,cleanedEmailBody,fileUpload_url) {
+
+  
+
+if(SAVE_ATTACHMENT){ // if options > save attachment checbox checked
+
+    let attachments =  extractAttachments(data);
+        
+        // if (attachments.length > 0) {
+        //    // console.log("Attachments extracted:", attachments);
+        //     // You can now process these attachments (upload, create comment, etc.)
+        // } else {
+        //    // console.log("No attachments found.");
+        // }
+
+    let attachmentUrls = [];
+    if (attachments.length > 0) {
+       // console.log(`Found ${attachments.length} attachment(s) in email.`);
+        for (let attachment of attachments) {
+
+            let fileBlob = await browser.messages.getAttachmentFile(item.id, attachment.partName);
+            let attachmentUrl = await postData_UploadAttachments(fileUpload_url,fileBlob, attachment.name);
+
+            if (attachmentUrl) {
+                attachmentUrls.push(attachmentUrl);
+            }
+        }
+
+
+if (attachmentUrls.length === 0) {
+//console.warn("No attachments to add to the comment.");  
+cleanedEmailBody = cleanedEmailBody;
+}else{
+let attached_files = "Attached files:\n" + attachmentUrls.map(url => `- [Attachment](${url})`).join("\n");
+cleanedEmailBody = cleanedEmailBody+" \n"+attached_files;
+}
+}
+
+}else{ // otherewise save only mail content
+
+  cleanedEmailBody = cleanedEmailBody;  
+}
+
+
+
+return cleanedEmailBody;
+}
+
+
+
 /*
 * Search Button Task submit
 */
@@ -209,7 +317,7 @@ if(document.querySelector('input[name="searchTaskName"]:checked')){
    selectedVal = document.querySelector('input[name="searchTaskName"]:checked').value ;
 }
 let url = 'task/'+selectedVal+'/comment';
-
+let fileUpload_url = 'task/'+selectedVal+'/attachment';
 
 
     let messageList = await browser.mailTabs.getSelectedMessages();
@@ -223,16 +331,28 @@ let url = 'task/'+selectedVal+'/comment';
     }
 
     try {
+
+
+let res_count = [];  // Define an empty array to store response
+let message_count = messageList.messages.length; // check message count
+
         for (const item of messageList.messages) {  
-            let data = await getMsgFull(item.id);
+
+
+  let data = await getMsgFull(item.id);
+
+
 
             // Safe Handling for Different Email Structures
             let emailBodyText = "";
 
             if (data.parts && data.parts.length > 0) {
+  
+
                 if (data.parts[0].parts && Array.isArray(data.parts[0].parts) && data.parts[0].parts.length > 0) {
+
                     // Multi-part email: Extract body from the first inner part
-                    emailBodyText = data.parts[0].parts[0].body || "";
+                    emailBodyText = data.parts[0].parts[0].body || data.parts[0].parts[0].parts[0].body || "";
                 } else {
                     // Single-part email: Use the direct body
                     emailBodyText = data.parts[0].body || "";
@@ -242,12 +362,11 @@ let url = 'task/'+selectedVal+'/comment';
                 emailBodyText = data.body || "";
             }
 
-        
- let cleanedEmailBody = removeQuotedText(emailBodyText);
-if(SAVE_TYPE === "TEXT"){
-            // Ensure the text is clean (remove HTML tags + extra whitespace)
-            cleanedEmailBody = stripHtml(cleanedEmailBody);    
-}
+
+/// GET BODY ANS ATTACHMENTS
+let cleanedEmailBody1 = await getBodyText_bySaveType(emailBodyText);
+let cleanedEmailBody = await getMailAttachmentsWithEmailBody(item,data,cleanedEmailBody1,fileUpload_url);
+
 
   
             let sendData = {
@@ -255,18 +374,38 @@ if(SAVE_TYPE === "TEXT"){
                 "notify_all": false
             };
 
+
+ //console.log(sendData);
             let response = await postData(url, sendData);
+
+if(response.id){
+res_count.push(response.id); 
+}
+
 
             if (!response) {
                 window.close(); // Close the window if there's no response
             }
+
         }
 
+if(message_count === res_count.length){
 swal('Success!', 'Mail List Successfully Saved!', 'success')
 .then(() => {
     //window.location.reload(); // Example: Reload the page
    window.close(); // close window
 });
+    
+}else{
+    swal('Error..!', 'An error occurred while saving email.', 'error')
+.then(() => {
+    //window.location.reload(); // Example: Reload the page
+   window.close(); // close window
+});   
+}
+
+
+
     } catch (error) {
         console.error("Error processing email:", error);
         swal('Error..!', 'An error occurred while saving emails.', 'error');
@@ -274,6 +413,31 @@ swal('Success!', 'Mail List Successfully Saved!', 'success')
 
 
 };
+
+
+
+
+ async function getBodyText_bySaveType(emailBodyText) {
+
+let cleanedEmailBody = "";
+
+if(SAVE_TYPE === "TEXT"){
+            cleanedEmailBody = removeQuotedText(emailBodyText);
+            // Ensure the text is clean (remove HTML tags + extra whitespace)
+            cleanedEmailBody = stripHtml(cleanedEmailBody);    
+}
+
+if(SAVE_TYPE === "HTML"){
+             cleanedEmailBody = removeQuotedText(emailBodyText);
+}
+
+if(SAVE_TYPE === "NON-TEXT"){
+            cleanedEmailBody = stripHtml(emailBodyText);   
+}
+
+return cleanedEmailBody;
+ }
+
 
 
 
@@ -300,6 +464,7 @@ if(document.querySelector('input[name="searchTagName"]:checked')){
 }
  
 let url = 'task/'+selectedVal+'/comment';
+let fileUpload_url = 'task/'+selectedVal+'/attachment';
 
     let messageList = await browser.mailTabs.getSelectedMessages();
     if (messageList.messages.length === 0) {
@@ -313,8 +478,15 @@ let url = 'task/'+selectedVal+'/comment';
     }
 
     try {
+
+let res_count = [];  // Define an empty array to store response
+let message_count = messageList.messages.length; // check message count
+
         for (const item of messageList.messages) {  
             let data = await getMsgFull(item.id);
+
+
+
 
             // Safe Handling for Different Email Structures
             let emailBodyText = "";
@@ -322,7 +494,7 @@ let url = 'task/'+selectedVal+'/comment';
             if (data.parts && data.parts.length > 0) {
                 if (data.parts[0].parts && Array.isArray(data.parts[0].parts) && data.parts[0].parts.length > 0) {
                     // Multi-part email: Extract body from the first inner part
-                    emailBodyText = data.parts[0].parts[0].body || "";
+                    emailBodyText = data.parts[0].parts[0].body || data.parts[0].parts[0].parts[0].body || "";
                 } else {
                     // Single-part email: Use the direct body
                     emailBodyText = data.parts[0].body || "";
@@ -334,13 +506,10 @@ let url = 'task/'+selectedVal+'/comment';
 
         
 
- let cleanedEmailBody = removeQuotedText(emailBodyText);
+/// GET BODY ANS ATTACHMENTS
+let cleanedEmailBody1 = await getBodyText_bySaveType(emailBodyText);
+let cleanedEmailBody = await getMailAttachmentsWithEmailBody(item,data,cleanedEmailBody1,fileUpload_url);
 
-
-if(SAVE_TYPE === "TEXT"){
-            // Ensure the text is clean (remove HTML tags + extra whitespace)
-            cleanedEmailBody = stripHtml(cleanedEmailBody);    
-}
 
             let sendData = {
                 "comment_text": cleanedEmailBody,
@@ -349,16 +518,36 @@ if(SAVE_TYPE === "TEXT"){
 
             let response = await postData(url, sendData);
 
+if(response.id){
+res_count.push(response.id); 
+}
+
+
+
             if (!response) {
                 window.close(); // Close the window if there's no response
             }
         }
 
+
+if(message_count === res_count.length){
 swal('Success!', 'Mail List Successfully Saved!', 'success')
 .then(() => {
     //window.location.reload(); // Example: Reload the page
    window.close(); // close window
 });
+    
+}else{
+    swal('Error..!', 'An error occurred while saving email.', 'error')
+.then(() => {
+    //window.location.reload(); // Example: Reload the page
+   window.close(); // close window
+});   
+}
+
+
+
+
     } catch (error) {
         console.error("Error processing email:", error);
         swal('Error..!', 'An error occurred while saving emails.', 'error');
@@ -408,6 +597,22 @@ function removeQuotedText(body) {
 }
 
 
+/*function removeQuotedText(body) {
+    const originalBody = body.trim();
+
+    // Remove everything after the first forwarded message block
+    let cleanedBody = body.split(/-------- Forwarded Message --------/i)[0].trim();
+
+    // Remove other quoted text patterns like "On ... wrote:", "From:", "To:", etc.
+    cleanedBody = cleanedBody
+        .split(/(?:On\s.*?wrote:|From:|To:|Subject:)/i)[0]
+        .split(/\n>/)[0]
+        .trim();
+
+    // If content was removed, add "..." at the end
+    return cleanedBody.length < originalBody.length ? cleanedBody + "\n\n..." : cleanedBody;
+}
+*/
 
 /*
 * Submit button inside list
@@ -415,6 +620,8 @@ function removeQuotedText(body) {
 document.getElementById("but_insideList").onclick = async () => {
     let selected_val = document.querySelector('#listOf_task').value;
     let url = 'task/' + selected_val + '/comment';
+    let fileUpload_url = 'task/'+selected_val+'/attachment';
+
 
     let messageList = await browser.mailTabs.getSelectedMessages();
     if (messageList.messages.length === 0) {
@@ -428,6 +635,10 @@ document.getElementById("but_insideList").onclick = async () => {
     }
 
     try {
+
+        let res_count = [];  // Define an empty array to store response
+let message_count = messageList.messages.length; // check message count
+
         for (const item of messageList.messages) {  
             let data = await getMsgFull(item.id);
 
@@ -437,7 +648,7 @@ document.getElementById("but_insideList").onclick = async () => {
             if (data.parts && data.parts.length > 0) {
                 if (data.parts[0].parts && Array.isArray(data.parts[0].parts) && data.parts[0].parts.length > 0) {
                     // Multi-part email: Extract body from the first inner part
-                    emailBodyText = data.parts[0].parts[0].body || "";
+                    emailBodyText = data.parts[0].parts[0].body || data.parts[0].parts[0].parts[0].body || "";
                 } else {
                     // Single-part email: Use the direct body
                     emailBodyText = data.parts[0].body || "";
@@ -448,12 +659,11 @@ document.getElementById("but_insideList").onclick = async () => {
             }
 
          
- let cleanedEmailBody = removeQuotedText(emailBodyText);
 
-if(SAVE_TYPE === "TEXT"){
-            // Ensure the text is clean (remove HTML tags + extra whitespace)
-            cleanedEmailBody = stripHtml(cleanedEmailBody);    
-}
+/// GET BODY ANS ATTACHMENTS
+let cleanedEmailBody1 = await getBodyText_bySaveType(emailBodyText);
+let cleanedEmailBody = await getMailAttachmentsWithEmailBody(item,data,cleanedEmailBody1,fileUpload_url);
+
 
 
             let sendData = {
@@ -463,12 +673,34 @@ if(SAVE_TYPE === "TEXT"){
 
             let response = await postData(url, sendData);
 
+
+if(response.id){
+res_count.push(response.id); 
+}
+
             if (!response) {
                 window.close(); // Close the window if there's no response
             }
         }
-swal('Success!', 'Mail List Successfully Saved!', 'success');
-       // alert('Mail List Successfully Saved!');
+
+
+
+if(message_count === res_count.length){
+swal('Success!', 'Mail List Successfully Saved!', 'success')
+.then(() => {
+    //window.location.reload(); // Example: Reload the page
+   window.close(); // close window
+});
+    
+}else{
+    swal('Error..!', 'An error occurred while saving email.', 'error')
+.then(() => {
+    //window.location.reload(); // Example: Reload the page
+   window.close(); // close window
+});   
+}
+
+
     } catch (error) {
         console.error("Error processing email:", error);
         swal('Error..!', 'An error occurred while saving emails.', 'error');
@@ -483,6 +715,7 @@ swal('Success!', 'Mail List Successfully Saved!', 'success');
 document.getElementById("but_outsideList").onclick = async () => {
  let selected_val = document.querySelector('#folderless_listOf_task').value ;
  let url = 'task/'+selected_val+'/comment';
+let fileUpload_url = 'task/'+selected_val+'/attachment';
 
 
 
@@ -498,6 +731,10 @@ document.getElementById("but_outsideList").onclick = async () => {
     }
 
     try {
+
+let res_count = [];  // Define an empty array to store response
+let message_count = messageList.messages.length; // check message count
+
         for (const item of messageList.messages) {  
             let data = await getMsgFull(item.id);
 
@@ -507,7 +744,7 @@ document.getElementById("but_outsideList").onclick = async () => {
             if (data.parts && data.parts.length > 0) {
                 if (data.parts[0].parts && Array.isArray(data.parts[0].parts) && data.parts[0].parts.length > 0) {
                     // Multi-part email: Extract body from the first inner part
-                    emailBodyText = data.parts[0].parts[0].body || "";
+                    emailBodyText = data.parts[0].parts[0].body || data.parts[0].parts[0].parts[0].body || "";
                 } else {
                     // Single-part email: Use the direct body
                     emailBodyText = data.parts[0].body || "";
@@ -518,12 +755,9 @@ document.getElementById("but_outsideList").onclick = async () => {
             }
 
          
- let cleanedEmailBody = removeQuotedText(emailBodyText);
-
-if(SAVE_TYPE === "TEXT"){
-            // Ensure the text is clean (remove HTML tags + extra whitespace)
-            cleanedEmailBody = stripHtml(cleanedEmailBody);    
-}
+/// GET BODY ANS ATTACHMENTS
+let cleanedEmailBody1 = await getBodyText_bySaveType(emailBodyText);
+let cleanedEmailBody = await getMailAttachmentsWithEmailBody(item,data,cleanedEmailBody1,fileUpload_url);
 
 
             let sendData = {
@@ -533,12 +767,35 @@ if(SAVE_TYPE === "TEXT"){
 
             let response = await postData(url, sendData);
 
+if(response.id){
+res_count.push(response.id); 
+}
+
+
             if (!response) {
                 window.close(); // Close the window if there's no response
             }
         }
-swal('Success!', 'Mail List Successfully Saved!', 'success');
-       // alert('Mail List Successfully Saved!');
+
+
+
+if(message_count === res_count.length){
+swal('Success!', 'Mail List Successfully Saved!', 'success')
+.then(() => {
+    //window.location.reload(); // Example: Reload the page
+   window.close(); // close window
+});
+    
+}else{
+    swal('Error..!', 'An error occurred while saving email.', 'error')
+.then(() => {
+    //window.location.reload(); // Example: Reload the page
+   window.close(); // close window
+});   
+}
+
+
+
     } catch (error) {
         console.error("Error processing email:", error);
         swal('Error..!', 'An error occurred while saving emails.', 'error');
@@ -770,7 +1027,7 @@ url =  'list/'+list_id+'/task';
             if (data.parts && data.parts.length > 0) {
                 if (data.parts[0].parts && Array.isArray(data.parts[0].parts) && data.parts[0].parts.length > 0) {
                     // Multi-part email: Extract body from the first inner part
-                    emailBodyText = data.parts[0].parts[0].body || "";
+                    emailBodyText = data.parts[0].parts[0].body || data.parts[0].parts[0].parts[0].body || "";
                 } else {
                     // Single-part email: Use the direct body
                     emailBodyText = data.parts[0].body || "";
@@ -890,7 +1147,7 @@ async function proceedTo_but_foder_list_createTask() {
             if (data.parts && data.parts.length > 0) {
                 if (data.parts[0].parts && Array.isArray(data.parts[0].parts) && data.parts[0].parts.length > 0) {
                     // Multi-part email: Extract body from the first inner part
-                    emailBodyText = data.parts[0].parts[0].body || "";
+                    emailBodyText = data.parts[0].parts[0].body || data.parts[0].parts[0].parts[0].body || "";
                 } else {
                     // Single-part email: Use the direct body
                     emailBodyText = data.parts[0].body || "";
@@ -1447,6 +1704,46 @@ if (data.spaces !== undefined) {
   // Handle errors here
   }
   }
+
+
+
+
+  //  POST UPLOAD ATTACHMENTS method implementation:
+  async function postData_UploadAttachments(url_endpoint = '', fileBlob, filename) {
+
+ let formData = new FormData();
+    formData.append("attachment", fileBlob, filename);
+    formData.append("filename", filename);
+
+  let storedData = await browser.storage.local.get(["clickupToken", "refreshToken"]);
+  let token = storedData.clickupToken;
+  let urlSet = new URL(url_endpoint, URL_SET);
+  let loader = document.querySelector('#loader');
+  loader.style.display = 'block'
+  var myHeaders = new Headers();
+  //myHeaders.append("Content-Type", "application/json");
+  myHeaders.append("Authorization", token);
+  try{
+  let response = await fetch(urlSet, {
+  method: 'POST', // *GET, POST, PUT, DELETE, etc.
+  headers: myHeaders,
+  redirect: 'follow', // manual, *follow, error
+  body: formData // formData
+  });
+  loader.style.display = 'none';
+
+
+    let result = await response.json();
+if (!response.ok) throw new Error(result.err || "Attachment upload failed");
+
+       // console.log("Uploaded:", result.url);
+        return result.url;  // Return attachment URL
+    } catch (error) {
+        //console.error("Upload Error:", error);
+        return null;
+    }
+  }
+
 
 
 

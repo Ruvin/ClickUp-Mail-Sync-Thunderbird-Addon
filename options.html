@@ -28,20 +28,20 @@
 </div>
 </div>
 <div class="form-group row">
-<label for="redirect_url" class="col-sm-2 col-form-label"><span class="requi">*</span> Redirect URI:</label>
+<label for="redirect_url" class="col-sm-2 col-form-label"><span class="requi">*</span> Redirect URI: (You can't edit this)</label>
 <div class="col-sm-10">
-<input type="text" class="form-control" id="redirect_url" name="redirect_url" placeholder="https://your-redirect-url.com" maxlength="500">
+<input type="text" disabled class="form-control" id="redirect_url" name="redirect_url" placeholder="https://your-redirect-url.com" maxlength="500" value="https://app.clickup.com" style="background-color: lightgray;">
 </div>
 </div>
 <div class="form-group row">
-<label for="redirect_url" class="col-sm-2 col-form-label">Your Team name and ID:</label>
+<label for="team-name-and-id" class="col-sm-2 col-form-label">Your Team name and ID:</label>
 <div class="col-sm-10">
 <span  id="team-name"></span>  -  <span id="team-id"></span>
 </div>
 </div>
 
 <div class="form-group row default-items">
-<label for="redirect_url" class="col-sm-2 col-form-label">Enable Menu items:</label>
+<label for="enable-manu-items" class="col-sm-2 col-form-label">Enable Menu items:</label>
 <div class="col-sm-10">
 
 <input type="checkbox" id="searchByTaskID" name="searchByTaskID" title="Search By Task-ID / Custom-ID" value="searchByTaskID"> 
@@ -54,6 +54,15 @@
 <label for="searchByTag">Search By Tag</label> <br>
 </div>
 </div>
+
+<!-- enable Save mail attachments -->
+<div class="form-group row default-items">
+<div class="col-sm-10 d-flex align-items-center">
+<label for="saveMailAttachment" class="ml-2">Save Mail Attachments:</label>
+<input type="checkbox" id="saveMailAttachment" name="saveMailAttachment" value="saveMailAttachment"> 
+</div>
+</div>
+
 
 <div class="form-group row">
 <div class="col-sm-10 option-btn">
