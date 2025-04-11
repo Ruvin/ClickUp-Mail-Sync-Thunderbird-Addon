@@ -210,6 +210,7 @@ browser.runtime.onInstalled.addListener((details) => {
             outsideFolders: false,
             searchByTaskID: true,
             searchByTag: false,
+            redirectUrl: 'https://app.clickup.com',
             saveMailAttachment: false
         }).then(() => {
             console.log("Default settings have been saved.");

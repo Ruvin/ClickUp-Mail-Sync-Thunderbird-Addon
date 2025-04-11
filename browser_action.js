@@ -301,7 +301,47 @@ cleanedEmailBody = cleanedEmailBody+" \n"+attached_files;
 
 
 
-return cleanedEmailBody;
+
+// Adding mail meta
+
+///Feature
+    let from = data.headers.from ? data.headers.from.join(', ') : '';
+    let to = data.headers.to ? data.headers.to.join(', ') : '';
+    let cc = data.headers.cc ? data.headers.cc.join(', ') : '';
+    let subject = data.headers.subject ? data.headers.subject.join(', ') : '';
+
+    // Try parsing date from headers (more reliable fallback)
+    let dateHeader = data.headers.date ? data.headers.date[0] : '';
+    let parsedDate = dateHeader ? new Date(dateHeader) : null;
+
+    let sentDate = parsedDate ? parsedDate.toLocaleDateString() : 'N/A';
+    let sentTime = parsedDate ? parsedDate.toLocaleTimeString() : 'N/A';
+
+
+// console.log(from);
+// console.log(to);
+// console.log(subject);
+// //console.log(date);
+// console.log(sentDate);
+// console.log(sentTime);
+// console.log(data);
+/// Feature
+
+
+
+let fromMail = "Test";
+let mail_meta = "\nMail Meta:\n" + "From: " +from + " " + "\nTo: " +to + " "+ "\nCC: " +cc + " " + "\nSubject: " +subject + " "+ "\nDate: " +sentDate + " Time: " +sentTime;
+cleanedEmailBodyWithAdditionalDetails = cleanedEmailBody+" \n"+mail_meta;
+
+
+// console.log(mail_meta);
+// console.log(cleanedEmailBodyWithAdditionalDetails);
+// alert('test');
+//end testing
+
+
+
+return cleanedEmailBodyWithAdditionalDetails;
 }
 
 
@@ -361,6 +401,8 @@ let message_count = messageList.messages.length; // check message count
                 // Plain text fallback
                 emailBodyText = data.body || "";
             }
+
+
 
 
 /// GET BODY ANS ATTACHMENTS
