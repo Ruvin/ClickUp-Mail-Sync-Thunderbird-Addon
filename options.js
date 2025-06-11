@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 let getdata = await getCredentials();
 document.getElementById("clientId").value = getdata.clientId || "";
 document.getElementById("clientSecret").value = getdata.clientSecret || "";
-document.getElementById("redirect_url").value = getdata.redirectUrl || "";
+//document.getElementById("redirect_url").value = getdata.redirectUrl || "";
 
 document.querySelector("#team-name").innerHTML = getdata.teamName || "";
 document.querySelector("#team-id").innerHTML = getdata.teamId || "";
@@ -124,8 +124,12 @@ let confirmDelete = confirm("Are you sure you want to clear all the stored data 
 
 if (confirmDelete) {
 try {
-await browser.storage.local.clear();
+let chkState = await browser.storage.local.clear();
+	let setsearchByTaskID = true;
+await browser.storage.local.set({  searchByTaskID:setsearchByTaskID });
 alert("Storage cleared successfully!");
+
+
 } catch (error) {
 console.error("Error clearing storage:", error);
 }
