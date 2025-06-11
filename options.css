@@ -81,3 +81,7 @@ color: blue;
 .default-items input {
 width: auto;
 }
+
+.hidden{
+	display: none !important;
+}
